@@ -1,0 +1,19 @@
+{
+  "name": "mintxspeed",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/node": "^20.12.8",
+    "@types/ws": "^8.5.10",
+    "typescript": "^5.4.5"
+  },
+  "scripts": {
+    "start": "node index.js",
+    "build": "tsc"
+  },
+  "dependencies": {
+    "chalk": "^4.1.0",
+    "ws": "^8.17.0"
+  }
+}
