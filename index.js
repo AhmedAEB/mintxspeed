@@ -14,6 +14,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const ws_1 = __importDefault(require("ws"));
 const chalk_1 = __importDefault(require("chalk"));
+const clipboardy_1 = __importDefault(require("clipboardy"));
 const walletsList = {
     "CPDJZzVqhMXtoquqPYLkV683FjDzVn8Hpa2sE6STPuz1": "Profit",
     "4ovLAWnbexHn1HFiKmSdWubPXg2rSJ2sUx46pCNxcTbs": "LarpVonTrier",
@@ -139,14 +140,11 @@ function setupWebSocket() {
         return __awaiter(this, void 0, void 0, function* () {
             var _a, _b, _c;
             try {
-                const parsedData = JSON.parse(data.toString());
-                const transaction = (_a = parsedData.params) === null || _a === void 0 ? void 0 : _a.result.transaction;
+                const transaction = (_a = JSON.parse(data.toString()).params) === null || _a === void 0 ? void 0 : _a.result.transaction;
                 if (!transaction)
                     return;
                 const signerPublicKey = transaction.transaction.message.accountKeys.find((accountKey) => accountKey.signer === true).pubkey;
-                // Find the wallet label using the signer's public key
-                const walletLabel = walletsList[signerPublicKey];
-                if (!walletLabel)
+                if (!walletsList[signerPublicKey])
                     return; // Exit if wallet label is unknown
                 const JUPITER_PROGRAM_ID = 'JUP6LkbZbjS1jKKwapdHNy74zcZ3tLUZoi5QNyVTaV4';
                 const RAYDIUM_PROGRAM_ID = '675kPX9MHTjS2zt1qfr1NYHuzeLXfQM9H24wFSUt1Mp8';
@@ -210,15 +208,17 @@ function setupWebSocket() {
                 // Determine the swap platform as before
                 const swapPlatform = swapPlatforms[swapInstructions[0].programId] || 'Unknown';
                 if (token1) { // Check if token1 is defined
+                    clipboardy_1.default.writeSync(token1.address);
                     if (token1.change < 0) {
-                        console.log(chalk_1.default.red(`Sold ${Math.abs(token1.change)} ${token1.symbol} for ${solanaChange} SOL on ${swapPlatform} by ${walletLabel}`));
+                        console.log(chalk_1.default.red(`Sold ${Math.abs(token1.change)} ${token1.symbol} for ${solanaChange} SOL on ${swapPlatform} by ${walletsList[signerPublicKey]}`));
                     }
                     else {
-                        console.log(chalk_1.default.green(`Bought ${solanaChange} SOL for ${Math.abs(token1.change)} ${token1.symbol} on ${swapPlatform} by ${walletLabel}`));
+                        console.log(chalk_1.default.green(`Bought ${solanaChange} SOL for ${Math.abs(token1.change)} ${token1.symbol} on ${swapPlatform} by ${walletsList[signerPublicKey]}`));
                     }
                 }
                 else {
-                    console.log(chalk_1.default.blue(`Unknown Swap: ${tokenChanges[0].change} ${tokenChanges[0].symbol} for ${solanaChange} SOL on ${swapPlatform} by ${walletLabel}`));
+                    clipboardy_1.default.writeSync(tokenChanges[0].address);
+                    console.log(chalk_1.default.green(`Bought ${tokenChanges[0].change} ${tokenChanges[0].symbol} for ${solanaChange} SOL on ${swapPlatform} by ${walletsList[signerPublicKey]}`));
                 }
             }
             catch (error) {

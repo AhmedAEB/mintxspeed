@@ -1,5 +1,6 @@
 import WebSocket from 'ws';
 import chalk from 'chalk';
+import clipboardy from 'clipboardy';
 
 interface walletList {
     [key: string]: string;
@@ -216,13 +217,15 @@ function setupWebSocket() {
             const swapPlatform: string = swapPlatforms[swapInstructions[0].programId] || 'Unknown';
 
             if (token1) { // Check if token1 is defined
+                clipboardy.writeSync(token1.address);
                 if (token1.change < 0) {
                     console.log(chalk.red(`Sold ${Math.abs(token1.change)} ${token1.symbol} for ${solanaChange} SOL on ${swapPlatform} by ${walletsList[signerPublicKey]}`));
                 } else {
                     console.log(chalk.green(`Bought ${solanaChange} SOL for ${Math.abs(token1.change)} ${token1.symbol} on ${swapPlatform} by ${walletsList[signerPublicKey]}`));
                 }
             } else {
-                console.log(chalk.blue(`Unknown Swap: ${tokenChanges[0].change} ${tokenChanges[0].symbol} for ${solanaChange} SOL on ${swapPlatform} by ${walletsList[signerPublicKey]}`));
+                clipboardy.writeSync(tokenChanges[0].address);
+                console.log(chalk.green(`Bought ${tokenChanges[0].change} ${tokenChanges[0].symbol} for ${solanaChange} SOL on ${swapPlatform} by ${walletsList[signerPublicKey]}`));
             }
         } catch (error) {
             console.error('[WalletTracker] Error processing transaction:', error);
