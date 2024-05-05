@@ -136,16 +136,12 @@ function setupWebSocket() {
 
     ws.on('message', async function incoming(data: { toString: () => string; }) {
         try {
-            const parsedData = JSON.parse(data.toString());
-            const transaction = parsedData.params?.result.transaction;
+            const transaction = JSON.parse(data.toString()).params?.result.transaction;
             if (!transaction) return;
 
             const signerPublicKey = transaction.transaction.message.accountKeys.find((accountKey: { signer: boolean; }) => accountKey.signer === true).pubkey;
 
-            // Find the wallet label using the signer's public key
-            const walletLabel = walletsList[signerPublicKey] || 'Unknown Wallet';
-
-            if (walletLabel === 'Unknown Wallet') return; // Exit if wallet label is unknown
+            if (!walletsList[signerPublicKey]) return; // Exit if wallet label is unknown
 
             const JUPITER_PROGRAM_ID = 'JUP6LkbZbjS1jKKwapdHNy74zcZ3tLUZoi5QNyVTaV4';
             const RAYDIUM_PROGRAM_ID = '675kPX9MHTjS2zt1qfr1NYHuzeLXfQM9H24wFSUt1Mp8';
@@ -221,12 +217,12 @@ function setupWebSocket() {
 
             if (token1) { // Check if token1 is defined
                 if (token1.change < 0) {
-                    console.log(chalk.red(`Sold ${Math.abs(token1.change)} ${token1.symbol} for ${solanaChange} SOL on ${swapPlatform} by ${walletLabel}`));
+                    console.log(chalk.red(`Sold ${Math.abs(token1.change)} ${token1.symbol} for ${solanaChange} SOL on ${swapPlatform} by ${walletsList[signerPublicKey]}`));
                 } else {
-                    console.log(chalk.green(`Bought ${solanaChange} SOL for ${Math.abs(token1.change)} ${token1.symbol} on ${swapPlatform} by ${walletLabel}`));
+                    console.log(chalk.green(`Bought ${solanaChange} SOL for ${Math.abs(token1.change)} ${token1.symbol} on ${swapPlatform} by ${walletsList[signerPublicKey]}`));
                 }
             } else {
-                console.log(chalk.blue(`Unknown Swap: ${tokenChanges[0].change} ${tokenChanges[0].symbol} for ${solanaChange} SOL on ${swapPlatform} by ${walletLabel}`));
+                console.log(chalk.blue(`Unknown Swap: ${tokenChanges[0].change} ${tokenChanges[0].symbol} for ${solanaChange} SOL on ${swapPlatform} by ${walletsList[signerPublicKey]}`));
             }
         } catch (error) {
             console.error('[WalletTracker] Error processing transaction:', error);

@@ -145,8 +145,8 @@ function setupWebSocket() {
                     return;
                 const signerPublicKey = transaction.transaction.message.accountKeys.find((accountKey) => accountKey.signer === true).pubkey;
                 // Find the wallet label using the signer's public key
-                const walletLabel = walletsList[signerPublicKey] || 'Unknown Wallet';
-                if (walletLabel === 'Unknown Wallet')
+                const walletLabel = walletsList[signerPublicKey];
+                if (!walletLabel)
                     return; // Exit if wallet label is unknown
                 const JUPITER_PROGRAM_ID = 'JUP6LkbZbjS1jKKwapdHNy74zcZ3tLUZoi5QNyVTaV4';
                 const RAYDIUM_PROGRAM_ID = '675kPX9MHTjS2zt1qfr1NYHuzeLXfQM9H24wFSUt1Mp8';
